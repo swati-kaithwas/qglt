@@ -15,6 +15,14 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  phone: {
+    type: Number,
+    required: true,
+  },
+  countrycode: {
+    type: Number,
+    required: true,
+  },
 });
 const userModel = mongoose.model("user", userSchema);
 module.exports = userModel;

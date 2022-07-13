@@ -1,31 +1,42 @@
-const { bcrypt } = require("bcryptjs");
+const bcrypt = require("bcrypt");
 
 const userModel = require("../models/user");
 const jwt = require("jsonwebtoken");
 
-const SECRET_KEY = require("bcryptjs");
+const SECRET_KEY = require("bcrypt");
+// const PasswordFun = async (password) => {
+//   const hashedPassword = await SECRET_KEY.hash(password, 10);
+//   return hashedPassword.toString();
+// };
+
 const signup = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, phone, countrycode } = req.body;
   console.log(req.body);
-  console.log("heiii");
+
   try {
     const existingUser = await userModel.findOne({ email: email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    // const existingUser = await userModel.findOne({ email: email });
-    // if (!existingUser) {
-    //   return res.status(404).json({ message: "User not found" });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // console.log(hashedPassword);
+    // console.log("password", password);
+
+    const hashedPassword = await SECRET_KEY.hash(password, 10);
+    // let x = PasswordFun(password);
+
+    // // console.log(hashedPassword);
     const result = await userModel.create({
       email: email,
-      password: hashedPassword,
+      password: hashedPassword.toString(),
       username: username,
+      phone: phone,
+      countrycode: countrycode,
     });
-    const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY);
-    res.status(500).json({ message: "User not found" });
+    const token = jwt.sign(
+      { email: result.email, id: result._id },
+      SECRET_KEY.toString()
+    );
+    res.status(200).json(req.body);
   } catch (error) {
     console.log(error);
   }
@@ -44,7 +55,7 @@ const signin = async (req, res) => {
     }
     const token = jwt.sign(
       { email: existingUser.email, id: existingUser._id },
-      SECRET_KEY
+      SECRET_KEY.toString()
     );
     res.status(201).json({ user: existingUser, token: token });
   } catch (error) {
